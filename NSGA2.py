@@ -228,7 +228,7 @@ def nsga2(population_size=100, generations=50, visualizer=None):
 
         # 現世代集団をプロット
         if visualizer is not None:
-            visualizer.plot_population(population, generation=gen + 1)
+            visualizer.plot_population(population, generation=(gen + 1))
 
         print(f"Generation {gen + 1} completed.")
 
@@ -237,7 +237,7 @@ def nsga2(population_size=100, generations=50, visualizer=None):
 
 if __name__ == "__main__":
     visualizer = NSGA2Visualizer()
-    final_population = nsga2(population_size=100, generations=30, visualizer=visualizer)
+    final_population = nsga2(population_size=50, generations=30, visualizer=visualizer)
     print("\n最終世代の個体 (解ベクトルと目的関数値) : ")
     for ind in final_population:
         print(
