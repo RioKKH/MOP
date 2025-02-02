@@ -4,6 +4,8 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 
+# from benchmark_problems import evaluate
+
 
 """
 MOEA/D(Multi-Objective Evolutionaly Algorithm based on Decomposition)は、多目的最適化問題
@@ -33,6 +35,8 @@ class Individual:
 
 # 目的関数の評価
 def evaluate(ind):
+    # def evaluate_individual(ind):
+    # ind.objectives = evaluate(ind, problem="DTLZ1", M=3, k=5)
     x = ind.vector[0]
     f1 = x
     f2 = 1 - np.sqrt(x)
@@ -152,9 +156,11 @@ def moead(population_size=100, generations=50, T=20, visualizer=None):
     neighborhoods = get_neighborhood(weight_vectors, T)
 
     # 初期集団の生成と評価
+    # population = [Individual([random.random()]) for _ in range(population_size)]
     population = [Individual([random.random()]) for _ in range(population_size)]
     for ind in population:
         evaluate(ind)
+        # evaluate_individual(ind)
 
     # 初期集団をプロット
     if visualizer is not None:
@@ -176,6 +182,7 @@ def moead(population_size=100, generations=50, T=20, visualizer=None):
             child, _ = crossover(parent1, parent2)
             mutate(child)
             evaluate(child)
+            # evaluate_individual(child)
 
             # 理想点zの更新
             update_ideal(z, child)
