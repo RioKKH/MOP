@@ -1,0 +1,4 @@
+**/*.npy
+**/nohup.out
+__pycache__/
+.venv
