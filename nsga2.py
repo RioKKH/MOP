@@ -3,35 +3,8 @@
 import numpy as np
 import random
 import matplotlib.pyplot as plt
-
-
-# 個体を表すクラス
-class Individual:
-    def __init__(self, vector):
-        self.vector = np.array(vector)  # 解の表現(ここでは１次元)
-        self.objectives = []  # 各目的関数の値
-        self.rank = None  # 非裂開ソーティングでのランク(フロント番号)
-        self.crowding_distance = 0.0  # クラウディング距離
-
-
-# 目的関数の評価
-def evaluate(ind):
-    # # 例として、1変数x ∊ [0, 1]の解に対し、
-    # # 目的関数 f1 = x, f2 = 1 - sqrt(x) (どちらも最小化)とする
-    # x = ind.vector[0]
-    # f1 = x
-    # f2 = 1 - np.sqrt(x)
-    # ind.objectives = [f1, f2]
-    """
-    ZDT1 ベンチマーク問題の評価関数
-    ind.vectorは30次元のリスト/配列と想定
-    結果は ind.objectives に[f1, v2]をセットする
-    """
-    n = len(ind.vector)
-    f1 = ind.vector[0]
-    g = 1 + 9 / (n - 1) * sum(ind.vector[1:])
-    f2 = g * (1 - np.sqrt(ind.vector[0] / g))
-    ind.objectives = [f1, f2]
+from evaluation import evaluate
+from individual import Individual
 
 
 # 個体pが個体qを支配しているかどうか
@@ -133,62 +106,12 @@ def mutate(ind, mutation_rate=0.1, sigma=0.1):
             ind.vector[i] = max(0, min(1, ind.vector[i]))
 
 
-# 可視化の為のクラス
-class NSGA2Visualizer:
-    def __init__(self, x_range=(0, 1), y_range=(0, 1)):
-        # インタラクティブモードON (描画を更新)
-        plt.ion()
-        self.fig, self.ax = plt.subplots()
-        self.x_range = x_range
-        self.y_range = y_range
-
-    def plot_population(self, population, generation, max_rank=3):
-        self.ax.clear()
-        # ランクごとの色リスト: max_rankまでの色を指定。足りなければデフォルト色を利用
-        rank_colors = ["blue", "green", "red"]
-
-        # ランクごとにフィルタしてプロットする
-        for rank in range(1, max_rank + 1):
-            rank_population = [ind for ind in population if ind.rank == rank]
-            if rank_population:
-                # 各個体の目的関数値を抽出
-                f1_vals = [ind.objectives[0] for ind in population]
-                f2_vals = [ind.objectives[1] for ind in population]
-                color = (
-                    rank_colors[rank - 1] if rank - 1 < len(rank_colors) else "black"
-                )
-                self.ax.scatter(
-                    f1_vals, f2_vals, c=color, marker="o", alpha=0.5, label=f"{rank}"
-                )
-        # max_rank寄り大きいランクの個体は別色でプロット
-        others = [ind for ind in population if ind.rank > max_rank]
-        if others:
-            f1_vals = [ind.objectives[0] for ind in population]
-            f2_vals = [ind.objectives[1] for ind in population]
-            self.ax.scatter(
-                f1_vals,
-                f2_vals,
-                c="gray",
-                marker="o",
-                alpha=0.5,
-                lable=f"Rank > {max_rank}",
-            )
-
-        self.ax.set_xlabel("Objective 1")
-        self.ax.set_ylabel("Objective 2")
-        self.ax.set_title(f"Generation {generation}")
-        self.ax.set_xlim(self.x_range)
-        self.ax.set_ylim(self.y_range)
-        self.ax.set_aspect("equal", adjustable="box")
-        self.ax.grid(True)
-        plt.draw()
-        plt.pause(0.5)  # 0.5秒間表示
-
-
 # NSGA-IIのメインアルゴリズム
 def nsga2(population_size=100, generations=50, visualizer=None):
-    # 初期集団の生成と評価
-    population = [Individual([random.random()]) for _ in range(population_size)]
+    # 30次元の個体を生成する
+    population = [
+        Individual([random.random() for _ in range(30)]) for _ in range(population_size)
+    ]
     for ind in population:
         evaluate(ind)
 
